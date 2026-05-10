@@ -1,5 +1,5 @@
 ---
-title: "Final Project: NLP Features and Belief Change in Chatbot Conversations"
+title: "Final Project: Belief Change in Chatbot Conversations"
 author: "Luan Chau"
 date: "2026-05-08"
 output: html_document
@@ -7,15 +7,24 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# Load required packages
+library(tidyverse)
+library(tidytext)
 ```
 
 ## Introduction
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This project develops an end-to-end R workflow to examine whether linguistic features of participants’ chatbot conversations are associated with belief change following an AI misconception intervention. The dataset originates from an experimental study in which participants were randomly assigned to one of three chatbot conditions: (1) a control non-refutational chatbot, (2) a simple refutation chatbot, and (3) an empathetic refutation chatbot. In each condition, participants engaged in four-turn conversations with the chatbot.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+In the control condition, the chatbot did not attempt to correct participants’ misconceptions about AI. In the simple refutation condition, the chatbot explicitly identified participants’ beliefs as misconceptions and provided explanatory evidence to refute them. In the empathetic refutation condition, the chatbot first acknowledged and validated participants’ beliefs before gently explaining why the belief was a misconception and then providing corrective evidence.
 
-```{r cars}
-summary(cars)
-```
+Before and after interacting with the chatbot, participants rated their agreement with one of three AI misconceptions on a scale from 0 (“Totally disagree”) to 100 (“Totally agree”). Participants completed this procedure for each of the three misconceptions included in the study:
+
+“AI works like the human brain.”
+“AI can be 100% objective.”
+“AI can understand and solve new problems the way the human brain can.”
+
+The purpose of the study is to examine whether participants change their beliefs after conversing with the chatbot, particularly in the simple refutation and empathetic refutation conditions.
+
+## Research Question 
 
