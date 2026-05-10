@@ -14,7 +14,7 @@ library(tidytext)
 
 ## Introduction
 
-This project develops an end-to-end R workflow to examine whether linguistic features of participants’ chatbot conversations are associated with belief change following an AI misconception intervention. The dataset originates from an experimental study in which participants were randomly assigned to one of three chatbot conditions: (1) a control non-refutational chatbot, (2) a simple refutation chatbot, and (3) an empathetic refutation chatbot. In each condition, participants engaged in four-turn conversations with the chatbot.
+This project develops an end-to-end R workflow to examine whether the effectiveness of chatbot-based refutation differed across specific AI misconceptions. The dataset originates from an experimental study in which participants were randomly assigned to one of three chatbot conditions: (1) a control non-refutational chatbot, (2) a simple refutation chatbot, and (3) an empathetic refutation chatbot. In each condition, participants engaged in four-turn conversations with the chatbot.
 
 In the control condition, the chatbot did not attempt to correct participants’ misconceptions about AI. In the simple refutation condition, the chatbot explicitly identified participants’ beliefs as misconceptions and provided explanatory evidence to refute them. In the empathetic refutation condition, the chatbot first acknowledged and validated participants’ beliefs before gently explaining why the belief was a misconception and then providing corrective evidence.
 
@@ -27,4 +27,18 @@ Before and after interacting with the chatbot, participants rated their agreemen
 The purpose of the study is to examine whether participants change their beliefs after conversing with the chatbot, particularly in the simple refutation and empathetic refutation conditions.
 
 ## Research Question 
+
+In the original study, we examined the effects of the three chatbot conditions on misconception reduction over time. We found that participants who interacted with the simple refutation and empathetic refutation chatbots showed substantial reductions in misconceptions, whereas participants in the control condition showed little to no change. However, we did not examine whether the magnitude of belief change was consistent across the three targeted misconceptions.
+
+Therefore, in this project, I explored whether the effectiveness of chatbot-based refutation differed across specific AI misconceptions. In particular, I examined whether some misconceptions were more resistant to change than others following interactions with the simple refutation and empathetic refutation chatbots. By analyzing belief change at the misconception level, this project aimed to provide a more fine-grained understanding of how individuals respond to different forms of corrective chatbot interventions.
+
+My research question is as follows:
+Do participants exhibit different levels of belief reduction across AI misconceptions after interacting with simple refutation and empathetic refutation chatbots?
+
+## Hypotheses
+1) Belief ratings will decrease from pretest to posttest in the simple refutation and empathetic refutation conditions across misconceptions.
+
+2) Some misconceptions will show larger reductions in belief ratings than others following interactions with the simple refutation and empathetic refutation chatbots.
+
+3) Misconceptions related to human-like thinking in AI may be more resistant to change than misconceptions related to AI bias or objectivity.
 
