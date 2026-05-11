@@ -67,4 +67,133 @@ setwd("C:/Users/admin/Documents/GitHub/EPSY5123-Final-Project-Luan-Chau/data")
 
 #load data
 chatbotdata <- read_csv2("chatbotdata.csv")
+
+#inspect the data
+head(chatbotdata)
+summary(chatbotdata)
+```
+
+## Data wrangling: Reshape the data to long format for analysis and compute change scores
+Because the study involved repeated belief ratings across multiple misconceptions and time points for each participant, the dataset was reshaped from wide format (the current format) to long format prior to analysis. Long format is more appropriate for repeated measures analyses because it organizes each observation as a separate row, allowing time (pre and post), misconception type, and chatbot condition to be modeled as variables rather than as separate columns. 
+
+This structure facilitates data visualization, descriptive statistics, and statistical modeling using repeated measures approaches such as mixed-effects models. 
+
+```{r reshape the data to long format}
+chatbot_long <- chatbotdata %>%
+  pivot_longer(
+    cols = starts_with(c("PreSlider", "PostSlider")), #select all pretest and posttest belief rating columns
+    names_to = c("Time", "Misconception"), # split the original column names into two new variables
+    names_pattern = "(PreSlider|PostSlider)_(\\d)",# extract time point and misconception number from column names
+    values_to = "BeliefRating" # store the belief rating values in one column
+  ) %>%
+  mutate(
+    Time = recode(Time,
+                  "PreSlider" = "Pre",
+                  "PostSlider" = "Post"), # rename time labels to more simple names
+    BeliefRating = as.numeric(BeliefRating), # convert belief ratings into numeric values
+
+    Misconception = factor(Misconception), #convert misconception number into a categorical variable
+    
+    SelectedStyle = factor(SelectedStyle) # convert chatbot condition into a categorical variable
+  )
+
+glimpse(chatbot_long) # display the structure of the reshaped dataset
+```
+```{r create change scores}
+belief_change <- chatbot_long %>% # create a new dataset containing belief change scores
+  select(ParticipantNo, SelectedStyle, Misconception, Time, BeliefRating) %>% # keep only relevant variables
+  group_by(ParticipantNo, SelectedStyle, Misconception, Time) %>% # group data by participant, condition, misconception, and time
+  summarise( # compute the mean belief rating for each grouped observation
+    BeliefRating = mean(BeliefRating, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider( # Reshape the data from long to wide format and create separate columns for Pre and Post belief ratings
+    names_from = Time,
+    values_from = BeliefRating
+  ) %>%
+  mutate( # compute belief reduction
+    BeliefReduction = Pre - Post
+  )
+
+glimpse(belief_change) # display structure of the data frame
+```
+
+
+
+## Descriptive statistics by condition and time
+
+```{r descriptive statistics by condition and time}
+chatbot_long %>%
+  filter(!is.na(SelectedStyle)) %>%
+  group_by(SelectedStyle, Misconception, Time) %>%
+  summarise(
+    MeanBelief = mean(BeliefRating, na.rm = TRUE),
+    SDBelief = sd(BeliefRating, na.rm = TRUE),
+    N = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(SelectedStyle, Misconception, desc(Time))
+```
+
+Descriptive statistics suggested that misconceptions differed in their susceptibility to revision. For the simple refutation and empathetic refutation condition, Misconception 1 demonstrated the largest reductions in belief ratings, whereas Misconception 3 exhibited comparatively smaller reductions, suggesting greater resistance to change. In contrast, participants in the control condition showed minimal changes across all misconceptions. 
+
+Notably, the empathetic and simple refutation chatbots produced broadly similar patterns of belief reduction across misconception types, indicating that both forms of conversational refutation were effective in reducing misconception endorsement.
+
+
+## Plotting belief change by condition, misconception, and time
+
+```{r exploratory plot, historgram of belief reduction}
+ggplot(
+  belief_change %>%
+    filter(SelectedStyle != "control"),
+  
+  aes(x = Misconception,
+      y = BeliefReduction,
+      fill = SelectedStyle)
+) +
+  
+  geom_boxplot(alpha = .70) +
+  
+  labs(
+    title = "Exploring Belief Reduction Across Misconceptions",
+    x = "Misconception",
+    y = "Belief Reduction (Pre - Post)",
+    fill = "Chatbot Condition"
+  ) +
+  
+  theme_minimal()
+```
+
+```{r communicative plot}
+ggplot(
+  chatbot_long %>%
+    filter(SelectedStyle != "control") %>%
+    mutate(
+      Time = factor(Time, levels = c("Pre", "Post"))
+    ),
+  
+  aes(x = Time,
+      y = BeliefRating,
+      group = SelectedStyle,
+      color = SelectedStyle)
+) +
+  
+  stat_summary(fun = mean, geom = "line", linewidth = 1) +
+  
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  
+  stat_summary(fun.data = mean_se,
+               geom = "errorbar",
+               width = .10) +
+  
+  facet_wrap(~ Misconception) +
+  
+  labs(
+    title = "Belief Revision Across Misconceptions",
+    x = "Time",
+    y = "Belief Rating",
+    color = "Chatbot Condition"
+  ) +
+  
+  theme_minimal()
 ```
