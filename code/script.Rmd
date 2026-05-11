@@ -14,6 +14,8 @@ library(broom)
 library(lme4)
 library(lmerTest)
 library(readr)
+library(tidymodels)
+library(sjPlot)
 ```
 
 ## Introduction
@@ -72,6 +74,10 @@ chatbotdata <- read_csv2("chatbotdata.csv")
 head(chatbotdata)
 summary(chatbotdata)
 ```
+The dataset included 120 participants and contained pre- and post-interaction belief ratings for three AI misconceptions. Across misconceptions, mean belief ratings generally decreased from pre- to post-interaction, suggesting overall reductions in misconception endorsement following chatbot interaction.
+
+
+Misconception 1 showed the highest average pre-interaction belief ratings (M = 59.60), followed by Misconception 2 (M = 57.59) and Misconception 3 (M = 47.47). Post-interaction belief ratings were lower across all misconceptions, with means ranging from 33.57 to 38.73. The wide ranges and quartile distributions indicated substantial variability in participants’ misconception beliefs and responsiveness to corrective information.
 
 ## Data wrangling: Reshape the data to long format for analysis and compute change scores
 Because the study involved repeated belief ratings across multiple misconceptions and time points for each participant, the dataset was reshaped from wide format (the current format) to long format prior to analysis. Long format is more appropriate for repeated measures analyses because it organizes each observation as a separate row, allowing time (pre and post), misconception type, and chatbot condition to be modeled as variables rather than as separate columns. 
@@ -118,8 +124,6 @@ belief_change <- chatbot_long %>% # create a new dataset containing belief chang
 glimpse(belief_change) # display structure of the data frame
 ```
 
-
-
 ## Descriptive statistics by condition and time
 
 ```{r descriptive statistics by condition and time}
@@ -140,7 +144,7 @@ Descriptive statistics suggested that misconceptions differed in their susceptib
 Notably, the empathetic and simple refutation chatbots produced broadly similar patterns of belief reduction across misconception types, indicating that both forms of conversational refutation were effective in reducing misconception endorsement.
 
 
-## Plotting belief change by condition, misconception, and time
+## Visualizations: Plotting belief change by condition, misconception, and time
 
 ```{r exploratory plot, historgram of belief reduction}
 ggplot(
@@ -163,8 +167,9 @@ ggplot(
   
   theme_minimal()
 ```
+The box plots suggested variability in belief revision across misconceptions and participants. Misconception 3 demonstrated comparatively smaller median reductions in belief ratings, indicating greater resistance to change, whereas Misconception 1 showed larger reductions across both chatbot conditions. Considerable variability and several outliers were also observed, suggesting substantial individual differences in responsiveness to chatbot-based refutation. Across misconceptions, the empathetic and simple refutation conditions exhibited broadly similar distributions of belief reduction.
 
-```{r communicative plot}
+```{r communicative plot, line graph}
 ggplot(
   chatbot_long %>%
     filter(SelectedStyle != "control") %>%
@@ -197,3 +202,23 @@ ggplot(
   
   theme_minimal()
 ```
+The line graph illustrates changes in misconception belief ratings across time, chatbot condition, and misconception type. Across all misconceptions, participants demonstrated lower belief ratings following interaction with the refutational chatbots. Both empathetic and simple refutation conditions showed substantial reductions in misconception endorsement and produced broadly similar patterns of change. However, the magnitude of belief revision varied across misconceptions. Misconception 1 demonstrated the largest reductions in belief ratings, whereas Misconception 3 exhibited comparatively smaller decreases, suggesting greater resistance to revision.
+
+## Modeling 
+
+```{r continuous prediction model; linear mixed effects model}
+misconception_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(
+    BeliefRating ~ Time * Misconception,
+    data = chatbot_long
+  )
+
+misconception_fit
+tab_model(misconception_fit)
+```
+Regression analyses examined whether belief revision differed across misconception types. Results indicated a significant overall effect of time, such that participants reported substantially higher belief ratings at pre-test than at post-test, b = 23.48, 95% CI [15.23, 31.74], p < .001, suggesting significant reductions in misconception endorsement following chatbot interaction. No significant main effects of misconception type were observed at post-test, indicating that post-interaction belief ratings were generally comparable across misconceptions. Interaction effects between time and misconception type were also not statistically significant. 
+
+However, Misconception 3 demonstrated a comparatively larger negative interaction coefficient, b = -9.58, 95% CI [-21.25, 2.09], p = .107, suggesting that this misconception may have been somewhat more resistant to revision than Misconception 1. This pattern was broadly consistent with the descriptive statistics and visualizations, which showed comparatively smaller reductions in belief ratings for Misconception 3. 
+
+Overall, the findings suggest that chatbot interaction was effective in reducing AI misconception beliefs, although the magnitude of belief revision may vary somewhat across misconception types.
