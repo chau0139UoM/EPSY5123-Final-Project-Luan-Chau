@@ -1,5 +1,5 @@
 ---
-title: "Final Project: Belief Change in Chatbot Conversations"
+title: "EPSY5123 - Final Project: Belief Change in Chatbot Conversations"
 author: "Luan Chau"
 date: "2026-05-08"
 output: html_document
@@ -18,7 +18,7 @@ library(tidymodels)
 library(sjPlot)
 ```
 
-## Introduction
+# 1. Introduction
 
 This project develops an end-to-end R workflow to examine whether the effectiveness of chatbot-based refutation differed across specific AI misconceptions. The dataset originates from an experimental study in which participants were randomly assigned to one of three chatbot conditions: (1) a control non-refutational chatbot, (2) a simple refutation chatbot, and (3) an empathetic refutation chatbot. In each condition, participants engaged in four-turn conversations with the chatbot.
 
@@ -32,7 +32,7 @@ Before and after interacting with the chatbot, participants rated their agreemen
 
 The purpose of the study is to examine whether participants change their beliefs after conversing with the chatbot, particularly in the simple refutation and empathetic refutation conditions.
 
-## Research Question 
+# 2. Research Question 
 
 In the original study, we examined the effects of the three chatbot conditions on misconception reduction over time. We found that participants who interacted with the simple refutation and empathetic refutation chatbots showed substantial reductions in misconceptions, whereas participants in the control condition showed little to no change. However, we did not examine whether the magnitude of belief change was consistent across the three targeted misconceptions.
 
@@ -41,14 +41,14 @@ Therefore, in this project, I explored whether the effectiveness of chatbot-base
 My research question is as follows:
 Do participants exhibit different levels of belief reduction across AI misconceptions after interacting with simple refutation and empathetic refutation chatbots?
 
-## Hypotheses
-1) Belief ratings will decrease from pretest to posttest in the simple refutation and empathetic refutation conditions across misconceptions.
+# 3. Hypotheses
+1) Overall, belief ratings will decrease from pretest to posttest in the simple refutation and empathetic refutation conditions across misconceptions.
 
 2) Some misconceptions will show larger reductions in belief ratings than others following interactions with the simple refutation and empathetic refutation chatbots.
 
 3) Misconceptions related to human-like thinking in AI may be more resistant to change than misconceptions related to AI bias or objectivity.
 
-## Data Description
+# 4. Data Description
 This project uses a deidentified dataset after a chatbot misconception intervention study. Each participant responds to three misconceptions at pre-test and post-test
 
 The dataset contains: 
@@ -61,7 +61,7 @@ The dataset contains:
 - PreSlider_3: Agreement pre-rating Misconception 3 (0-100)
 - PostSlider_3: Agreement post-rating Misconception 3 (0-100)
 
-## Load and inspect the dataset
+# 5. Data Preparation
 
 ```{r load-dataset and inspect-dataset}
 #set working directory
@@ -76,13 +76,14 @@ summary(chatbotdata)
 ```
 The dataset included 120 participants and contained pre- and post-interaction belief ratings for three AI misconceptions. Across misconceptions, mean belief ratings generally decreased from pre- to post-interaction, suggesting overall reductions in misconception endorsement following chatbot interaction.
 
-
 Misconception 1 showed the highest average pre-interaction belief ratings (M = 59.60), followed by Misconception 2 (M = 57.59) and Misconception 3 (M = 47.47). Post-interaction belief ratings were lower across all misconceptions, with means ranging from 33.57 to 38.73. The wide ranges and quartile distributions indicated substantial variability in participants’ misconception beliefs and responsiveness to corrective information.
 
-## Data wrangling: Reshape the data to long format for analysis and compute change scores
+# 6. Data Wrangling
 Because the study involved repeated belief ratings across multiple misconceptions and time points for each participant, the dataset was reshaped from wide format (the current format) to long format prior to analysis. Long format is more appropriate for repeated measures analyses because it organizes each observation as a separate row, allowing time (pre and post), misconception type, and chatbot condition to be modeled as variables rather than as separate columns. 
 
-This structure facilitates data visualization, descriptive statistics, and statistical modeling using repeated measures approaches such as mixed-effects models. 
+This structure facilitates descriptive statistics, data visualization, and statistical modeling using repeated measures approaches such as mixed-effects models. 
+
+## 6.1. Reshape the data to long format
 
 ```{r reshape the data to long format}
 chatbot_long <- chatbotdata %>%
@@ -105,6 +106,10 @@ chatbot_long <- chatbotdata %>%
 
 glimpse(chatbot_long) # display the structure of the reshaped dataset
 ```
+## 6.2. Compute change scores
+
+Although change scores were not required for the primary repeated-measures analyses, they were computed to facilitate exploratory visualizations and descriptive examination of belief reduction patterns across misconceptions and chatbot conditions.
+
 ```{r create change scores}
 belief_change <- chatbot_long %>% # create a new dataset containing belief change scores
   select(ParticipantNo, SelectedStyle, Misconception, Time, BeliefRating) %>% # keep only relevant variables
@@ -124,7 +129,7 @@ belief_change <- chatbot_long %>% # create a new dataset containing belief chang
 glimpse(belief_change) # display structure of the data frame
 ```
 
-## Descriptive statistics by condition and time
+# 7. Descriptive statistics by condition and time
 
 ```{r descriptive statistics by condition and time}
 chatbot_long %>%
@@ -144,7 +149,7 @@ Descriptive statistics suggested that misconceptions differed in their susceptib
 Notably, the empathetic and simple refutation chatbots produced broadly similar patterns of belief reduction across misconception types, indicating that both forms of conversational refutation were effective in reducing misconception endorsement.
 
 
-## Visualizations: Plotting belief change by condition, misconception, and time
+# 8. Visualizations: Plotting belief change by condition, misconception, and time
 
 ```{r exploratory plot, historgram of belief reduction}
 ggplot(
@@ -167,6 +172,7 @@ ggplot(
   
   theme_minimal()
 ```
+
 The box plots suggested variability in belief revision across misconceptions and participants. Misconception 3 demonstrated comparatively smaller median reductions in belief ratings, indicating greater resistance to change, whereas Misconception 1 showed larger reductions across both chatbot conditions. Considerable variability and several outliers were also observed, suggesting substantial individual differences in responsiveness to chatbot-based refutation. Across misconceptions, the empathetic and simple refutation conditions exhibited broadly similar distributions of belief reduction.
 
 ```{r communicative plot, line graph}
@@ -202,9 +208,13 @@ ggplot(
   
   theme_minimal()
 ```
-The line graph illustrates changes in misconception belief ratings across time, chatbot condition, and misconception type. Across all misconceptions, participants demonstrated lower belief ratings following interaction with the refutational chatbots. Both empathetic and simple refutation conditions showed substantial reductions in misconception endorsement and produced broadly similar patterns of change. However, the magnitude of belief revision varied across misconceptions. Misconception 1 demonstrated the largest reductions in belief ratings, whereas Misconception 3 exhibited comparatively smaller decreases, suggesting greater resistance to revision.
 
-## Modeling 
+The line graph illustrates changes in misconception belief ratings across time, chatbot condition, and misconception type. Across all misconceptions, participants demonstrated lower belief ratings following interaction with the refutational chatbots. Both empathetic and simple refutation conditions showed substantial reductions in misconception endorsement and produced broadly similar patterns of change. 
+
+However, the magnitude of belief revision varied across misconceptions. Misconception 1 demonstrated the largest reductions in belief ratings, whereas Misconception 3 exhibited comparatively smaller decreases, suggesting greater resistance to revision.
+
+# 9. Modeling 
+Because the study examined whether belief change differed across three misconceptions measured repeatedly within the same participants, a linear mixed-effects model was used to account for the repeated-measures structure of the data and participant-level variability.
 
 ```{r continuous prediction model; linear mixed effects model}
 misconception_fit <- linear_reg() %>%
@@ -222,3 +232,8 @@ Regression analyses examined whether belief revision differed across misconcepti
 However, Misconception 3 demonstrated a comparatively larger negative interaction coefficient, b = -9.58, 95% CI [-21.25, 2.09], p = .107, suggesting that this misconception may have been somewhat more resistant to revision than Misconception 1. This pattern was broadly consistent with the descriptive statistics and visualizations, which showed comparatively smaller reductions in belief ratings for Misconception 3. 
 
 Overall, the findings suggest that chatbot interaction was effective in reducing AI misconception beliefs, although the magnitude of belief revision may vary somewhat across misconception types.
+
+# 10. Reflections
+Although Misconception 3 appeared to be somewhat more resistant to change, this pattern should be interpreted cautiously. One possible explanation is participant expectancy effects, in which participants may have inferred the purpose of the study and adjusted their responses in ways they believed were expected or socially desirable. As a result, some participants may have reported lower post-interaction belief ratings than they genuinely endorsed. 
+
+To reduce this concern, a filler question was included at the end of the experiment asking participants what they believed the purpose of the study was, and participants who correctly identified the study purpose were excluded from the analyses. Nevertheless, future studies could incorporate additional filler tasks or distractor activities throughout the experiment to further minimize expectancy effects and reduce participants’ awareness of the study aims.
