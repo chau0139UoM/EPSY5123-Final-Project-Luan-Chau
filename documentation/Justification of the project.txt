@@ -1,0 +1,4 @@
+
+The final project was built on a dataset of a larger study that comprises an experimental study that has three phases. 
+The original goal of the study was to examine the effect of chatbot-based refutations on belief change among a group of educational stakeholders who have misconceptions about AI.
+
