@@ -52,6 +52,7 @@ Do participants exhibit different levels of belief reduction across AI misconcep
 This project uses a deidentified dataset after a chatbot misconception intervention study. Each participant responds to three misconceptions at pre-test and post-test
 
 The dataset contains: 
+
 - ParticipantNo: The participant identification number (N = 120)
 - SelectedStyle: The chatbot condition to which the participant was assigned
 - PreSlider_1: Agreement pre-rating Misconception 1 (0-100)
